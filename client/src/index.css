@@ -1,0 +1,76 @@
+@font-face {
+  font-family: 'Salesforce Sans';
+  src: url('./assets/fonts/Salesforce_Sans_Font/Salesforce_Sans_WebFonts/SalesforceSans-Regular.woff2') format('woff2'),
+       url('./assets/fonts/Salesforce_Sans_Font/Salesforce_Sans_WebFonts/SalesforceSans-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Salesforce Sans';
+  src: url('./assets/fonts/Salesforce_Sans_Font/Salesforce_Sans_WebFonts/SalesforceSans-Bold.woff2') format('woff2'),
+       url('./assets/fonts/Salesforce_Sans_Font/Salesforce_Sans_WebFonts/SalesforceSans-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Salesforce Sans';
+  src: url('./assets/fonts/Salesforce_Sans_Font/Salesforce_Sans_WebFonts/SalesforceSans-Light.woff2') format('woff2'),
+       url('./assets/fonts/Salesforce_Sans_Font/Salesforce_Sans_WebFonts/SalesforceSans-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Salesforce Sans';
+  src: url('./assets/fonts/Salesforce_Sans_Font/Salesforce_Sans_WebFonts/SalesforceSans-Italic.woff2') format('woff2'),
+       url('./assets/fonts/Salesforce_Sans_Font/Salesforce_Sans_WebFonts/SalesforceSans-Italic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Salesforce Sans';
+  src: url('./assets/fonts/Salesforce_Sans_Font/Salesforce_Sans_WebFonts/SalesforceSans-BoldItalic.woff2') format('woff2'),
+       url('./assets/fonts/Salesforce_Sans_Font/Salesforce_Sans_WebFonts/SalesforceSans-BoldItalic.woff') format('woff');
+  font-weight: 700;
+  font-style: italic;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Salesforce Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #EAF5FE;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+:root {
+  --sf-blue: #066AFE;
+  --sf-cloud-blue: #00B3FF;
+  --sf-teal: #06A59A;
+  --sf-yellow: #FCC003;
+  --sf-pink: #FF538A;
+  --sf-violet: #BA01FF;
+  --sf-orange: #F38303;
+  --sf-green: #45C65A;
+  --sf-white: #FFFFFF;
+  --sf-gray-95: #F3F3F3;
+  --sf-gray-80: #DDDBDA;
+  --sf-gray-60: #706E6B;
+  --sf-dark: #001E5B;
+}
