@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
+import axios from 'axios';
 import { programColors } from '../utils/salesforceColors';
 import { programTypes } from '../utils/checklistTemplate';
-import { Download, RefreshCw, CheckCircle } from 'lucide-react';
+import { Download, RefreshCw, CheckCircle, Zap } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import Button from '../components/Button';
 import { Card } from '../components/Card';
@@ -38,9 +39,12 @@ const BannerCreator = () => {
     location: 'Virtual',
     template: 'modern',
     size: 'default',
+    topic: '',
   });
   const [slackPost, setSlackPost] = useState('');
   const [copied, setCopied] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
   const bannerRef = useRef(null);
 
   const handleChange = (e) => {
@@ -49,6 +53,28 @@ const BannerCreator = () => {
   };
 
   const colors = programColors[bannerData.programType];
+
+  const generateWithAI = async () => {
+    setAiLoading(true);
+    setAiError('');
+    try {
+      const res = await axios.post('/api/ai/generate-banner', {
+        programType: bannerData.programType,
+        topic: bannerData.topic || bannerData.title,
+      });
+      setBannerData(prev => ({
+        ...prev,
+        title: res.data.title || prev.title,
+        subtitle: res.data.subtitle || prev.subtitle,
+      }));
+      if (res.data.slackPost) {
+        setSlackPost(res.data.slackPost);
+      }
+    } catch (err) {
+      setAiError(err.response?.data?.error || 'AI generation failed');
+    }
+    setAiLoading(false);
+  };
 
   const generateSlackPost = () => {
     setSlackPost(
@@ -82,11 +108,28 @@ const BannerCreator = () => {
         {/* Form */}
         <div className="lg:col-span-2 space-y-6">
           <Card hover={false} className="p-6 space-y-5">
-            <h3 className="text-base font-bold text-sf-blue-15">Details</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-sf-blue-15">Details</h3>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={generateWithAI}
+                disabled={aiLoading}
+              >
+                {aiLoading ? <RefreshCw size={14} className="animate-spin" /> : <Zap size={14} />}
+                {aiLoading ? 'Generating...' : 'AI Generate'}
+              </Button>
+            </div>
+
+            {aiError && (
+              <div className="text-sm text-sf-pink-40 bg-sf-pink-95 rounded-xl px-4 py-2">{aiError}</div>
+            )}
 
             <Select label="Program Type" name="programType" value={bannerData.programType} onChange={handleChange}>
               {programTypes.map(type => <option key={type} value={type}>{type}</option>)}
             </Select>
+
+            <Input label="Topic (for AI)" name="topic" value={bannerData.topic} onChange={handleChange} placeholder="e.g., AI agents, Cloud security, MCP..." />
 
             <Input label="Title" name="title" value={bannerData.title} onChange={handleChange} placeholder="e.g., AI & Trust Workshop" />
             <Input label="Subtitle" name="subtitle" value={bannerData.subtitle} onChange={handleChange} placeholder="e.g., Building Secure AI Solutions" />
@@ -192,9 +235,14 @@ const BannerCreator = () => {
           <Card hover={false} className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-bold text-sf-blue-15">Slack Post</h3>
-              <Button variant="secondary" size="sm" onClick={generateSlackPost}>
-                <RefreshCw size={16} /> Generate
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="ghost" size="sm" onClick={generateSlackPost}>
+                  <RefreshCw size={14} /> Manual
+                </Button>
+                <Button variant="secondary" size="sm" onClick={generateWithAI} disabled={aiLoading}>
+                  <Zap size={14} /> AI Generate
+                </Button>
+              </div>
             </div>
 
             {slackPost ? (
@@ -210,7 +258,7 @@ const BannerCreator = () => {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-sf-gray-60">Click "Generate" to create a formatted Slack post from your banner details.</p>
+              <p className="text-sm text-sf-gray-60">Use "Manual" for a template-based post, or "AI Generate" to create one with Gemini AI.</p>
             )}
           </Card>
         </div>

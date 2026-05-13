@@ -311,6 +311,63 @@ app.get('/api/google-sheets/status', (req, res) => {
   });
 });
 
+// Gemini AI endpoint
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDsQEum68TqoOWX77FLMCH0OUbf94PlK2c';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
+
+app.post('/api/ai/generate-banner', async (req, res) => {
+  try {
+    const { programType, topic, audience } = req.body;
+
+    const prompt = `You are a marketing copywriter for Salesforce Tech Enablement (T&P APAC).
+Generate banner content for a ${programType || 'Tech Talk'} program.
+${topic ? `Topic: ${topic}` : ''}
+${audience ? `Audience: ${audience}` : 'Audience: Engineers and developers at Salesforce'}
+
+Return ONLY valid JSON (no markdown, no code fences) with these fields:
+{
+  "title": "A compelling, concise title (max 8 words)",
+  "subtitle": "An engaging subtitle (max 15 words)",
+  "slackPost": "A formatted Slack announcement (3-5 lines with emojis, include hashtags #TechEnablement #TPAPAC)"
+}`;
+
+    const response = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-goog-api-key': GEMINI_API_KEY,
+      },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.error('Gemini API error:', err);
+      return res.status(response.status).json({ error: 'Gemini API error', details: err });
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return res.status(500).json({ error: 'Could not parse AI response', raw: text });
+    }
+
+    const parsed = JSON.parse(jsonMatch[0]);
+    res.json(parsed);
+  } catch (error) {
+    console.error('AI generation error:', error);
+    res.status(500).json({ error: 'Failed to generate content', message: error.message });
+  }
+});
+
+app.get('/api/ai/status', (req, res) => {
+  res.json({ available: true, model: 'gemini-flash-latest' });
+});
+
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
   const clientBuildPath = path.join(__dirname, '..', 'client', 'build');
