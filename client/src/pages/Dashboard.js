@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Users, TrendingUp, BookOpen, Handshake, ArrowRight, FileText, Award, Activity, RefreshCw } from 'lucide-react';
+import { Calendar, Users, TrendingUp, BookOpen, HeartHandshake, ArrowRight, FileText, Award, Activity, RefreshCw } from 'lucide-react';
 import { Card, StatCard } from '../components/Card';
 import { fetchProgramData } from '../utils/parseProgamData';
 
@@ -9,7 +9,7 @@ const programMeta = {
   'Calendar Training':   { icon: <Calendar size={28} />,   color: '#066AFE', bg: '#EDF4FF', link: '/programs/calendar-training',  desc: 'Scheduled learning paths' },
   'Cohort Programs':     { icon: <TrendingUp size={28} />, color: '#06A59A', bg: '#DEF9F3', link: '/programs/cohorts',            desc: 'Workshops & deep dives' },
   'Onboarding Program':  { icon: <BookOpen size={28} />,   color: '#45C65A', bg: '#EBF7E6', link: '/programs/onboarding',         desc: 'New member setup' },
-  'Partnership Programs':{ icon: <Handshake size={28} />,  color: '#F38303', bg: '#FFF1EA', link: '/programs/partnerships',       desc: 'Strategic collaborations' },
+  'Partnership Programs':{ icon: <HeartHandshake size={28} />,  color: '#F38303', bg: '#FFF1EA', link: '/programs/partnerships',       desc: 'Strategic collaborations' },
 };
 
 const quickActions = [

@@ -1,16 +1,16 @@
 import React from 'react';
-import { Handshake, Globe, Zap } from 'lucide-react';
+import { HeartHandshake, Globe, Zap } from 'lucide-react';
 import ProgramPageLayout from '../components/ProgramPageLayout';
 
 const PartnershipPrograms = () => (
   <ProgramPageLayout
-    icon={<Handshake />}
+    icon={<HeartHandshake />}
     title="Partnership Programs"
     subtitle="Strategic collaborations with industry leaders and technology partners"
     color="#F38303"
     colorLight="#FFBA90"
     stats={[
-      { icon: <Handshake size={22} />, value: '12', label: 'Active Partnerships' },
+      { icon: <HeartHandshake size={22} />, value: '12', label: 'Active Partnerships' },
       { icon: <Globe size={22} />, value: '8', label: 'Countries' },
       { icon: <Zap size={22} />, value: '24', label: 'Joint Initiatives' },
     ]}
