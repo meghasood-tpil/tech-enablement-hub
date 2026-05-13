@@ -432,6 +432,49 @@ app.get('/api/ai/status', (req, res) => {
   res.json({ available: !!GEMINI_API_KEY, model: 'gemini-flash' });
 });
 
+let newsCache = { data: null, timestamp: 0 };
+
+app.get('/api/news/salesforce', async (req, res) => {
+  if (!GEMINI_API_KEY) return res.status(503).json({ error: 'GEMINI_API_KEY not configured' });
+
+  const ONE_HOUR = 60 * 60 * 1000;
+  if (newsCache.data && Date.now() - newsCache.timestamp < ONE_HOUR) {
+    return res.json(newsCache.data);
+  }
+
+  try {
+    const prompt = `You are a Salesforce news aggregator. Provide the 5 most recent and important Salesforce news items from 2025-2026.
+Focus on: product launches, Agentforce updates, AI features, acquisitions, earnings, major partnerships, developer tools.
+Return ONLY valid JSON (no markdown, no code fences):
+[
+  { "title": "headline", "summary": "1-2 sentence summary", "category": "AI|Product|Business|Developer|Cloud" }
+]`;
+
+    const response = await fetch(GEMINI_TEXT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-goog-api-key': GEMINI_API_KEY },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      return res.status(response.status).json({ error: 'Failed to fetch news', details: err });
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) return res.status(500).json({ error: 'Could not parse news' });
+
+    const news = JSON.parse(jsonMatch[0]);
+    newsCache = { data: news, timestamp: Date.now() };
+    res.json(news);
+  } catch (error) {
+    console.error('News fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch news' });
+  }
+});
+
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
   const clientBuildPath = path.join(__dirname, '..', 'client', 'build');

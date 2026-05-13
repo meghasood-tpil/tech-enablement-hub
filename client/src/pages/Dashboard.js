@@ -3,14 +3,18 @@ import { Link } from 'react-router-dom';
 import { Calendar, Users, TrendingUp, BookOpen, HeartHandshake, ArrowRight, FileText, Award, Activity, RefreshCw } from 'lucide-react';
 import { Card, StatCard } from '../components/Card';
 import { fetchProgramData } from '../utils/parseProgamData';
+import axios from 'axios';
+import tpilLogo from '../assets/icons/tpil-logo.png';
 
 const programMeta = {
-  'Tech Talks':          { icon: <Users size={28} />,      color: '#BA01FF', bg: '#F9F0FF', link: '/programs/tech-talks',        desc: 'Expert-led sessions' },
-  'Calendar Training':   { icon: <Calendar size={28} />,   color: '#066AFE', bg: '#EDF4FF', link: '/programs/calendar-training',  desc: 'Scheduled learning paths' },
-  'Cohort Programs':     { icon: <TrendingUp size={28} />, color: '#06A59A', bg: '#DEF9F3', link: '/programs/cohorts',            desc: 'Workshops & deep dives' },
-  'Onboarding Program':  { icon: <BookOpen size={28} />,   color: '#45C65A', bg: '#EBF7E6', link: '/programs/onboarding',         desc: 'New member setup' },
-  'Partnership Programs':{ icon: <HeartHandshake size={28} />,  color: '#F38303', bg: '#FFF1EA', link: '/programs/partnerships',       desc: 'Strategic collaborations' },
+  'Tech Talks':          { icon: <Users size={28} />,              color: '#BA01FF', bg: '#F9F0FF', link: '/programs/tech-talks',       desc: 'Expert-led sessions' },
+  'Calendar Training':   { icon: <Calendar size={28} />,           color: '#066AFE', bg: '#EDF4FF', link: '/programs/calendar-training', desc: 'Scheduled learning paths' },
+  'Cohort Programs':     { icon: <TrendingUp size={28} />,         color: '#06A59A', bg: '#DEF9F3', link: '/programs/cohorts',           desc: 'Workshops & deep dives' },
+  'Onboarding Program':  { icon: <BookOpen size={28} />,           color: '#45C65A', bg: '#EBF7E6', link: '/programs/onboarding',        desc: 'New member setup' },
+  'Partnership Programs':{ icon: <HeartHandshake size={28} />,     color: '#F38303', bg: '#FFF1EA', link: '/programs/partnerships',      desc: 'Strategic collaborations' },
 };
+
+const categoryColors = { AI: '#BA01FF', Product: '#066AFE', Business: '#06A59A', Developer: '#F38303', Cloud: '#45C65A' };
 
 const quickActions = [
   { to: '/planner', icon: <FileText size={24} />, title: 'Create Program Plan', desc: 'Auto-generate checklist with timeline', color: '#066AFE' },
@@ -20,6 +24,8 @@ const quickActions = [
 
 const Dashboard = () => {
   const [data, setData] = useState(null);
+  const [news, setNews] = useState([]);
+  const [newsLoading, setNewsLoading] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,6 +33,11 @@ const Dashboard = () => {
       .then(setData)
       .catch(() => setData(null))
       .finally(() => setLoading(false));
+
+    axios.get('/api/news/salesforce')
+      .then((res) => setNews(res.data || []))
+      .catch(() => setNews([]))
+      .finally(() => setNewsLoading(false));
   }, []);
 
   if (loading) {
@@ -42,12 +53,46 @@ const Dashboard = () => {
 
   return (
     <div className="animate-fade-in">
-      {/* Hero */}
+      {/* Hero with Logo + News */}
       <div className="mb-10">
-        <h1 className="text-4xl font-bold text-sf-blue-15 tracking-tight">
-          Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}
-        </h1>
-        <p className="mt-2 text-lg text-sf-gray-60">CY2026 Tech Enablement at a glance — powered by real program data.</p>
+        <div className="flex items-center gap-6 mb-6">
+          <img src={tpilLogo} alt="Technology, People, Innovation & Learning" className="h-16 sm:h-20 object-contain" />
+        </div>
+
+        {/* News Ticker */}
+        <Card hover={false} className="p-5">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="px-2.5 py-1 bg-sf-blue-95 text-sf-blue-50 text-xs font-bold rounded-full uppercase tracking-wider">Latest</span>
+            <h3 className="text-sm font-bold text-sf-blue-15">Salesforce News</h3>
+          </div>
+          {newsLoading ? (
+            <div className="flex items-center gap-2 text-sm text-sf-gray-60">
+              <RefreshCw size={14} className="animate-spin" /> Fetching latest news...
+            </div>
+          ) : news.length > 0 ? (
+            <div className="space-y-3">
+              {news.map((item, i) => {
+                const catColor = categoryColors[item.category] || '#066AFE';
+                return (
+                  <div key={i} className="flex items-start gap-3 group">
+                    <span className="mt-1 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: catColor }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-semibold text-sf-blue-15">{item.title}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: `${catColor}15`, color: catColor }}>
+                          {item.category}
+                        </span>
+                      </div>
+                      <p className="text-xs text-sf-gray-60 mt-0.5">{item.summary}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-sf-gray-60">Unable to load news. Check your Gemini API key.</p>
+          )}
+        </Card>
       </div>
 
       {/* Overall Stats */}
@@ -60,7 +105,7 @@ const Dashboard = () => {
         <StatCard icon={<Activity size={22} />} value={`${stats?.avgTrainerCSAT || 0}%`} label="Trainer CSAT" color="#066AFE" />
       </div>
 
-      {/* Programs by Type */}
+      {/* Programs by Type — color coded */}
       <div className="mb-10">
         <h2 className="text-xl font-bold text-sf-blue-15 mb-5">Programs</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -68,49 +113,52 @@ const Dashboard = () => {
             const td = byType[type] || { count: 0, attendees: 0, registered: 0, avgCSAT: 0, avgTrainerCSAT: 0 };
             return (
               <Link key={type} to={meta.link} className="group">
-                <Card className="p-5 h-full">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110"
-                    style={{ backgroundColor: meta.bg, color: meta.color }}
-                  >
-                    {meta.icon}
-                  </div>
-                  <h3 className="text-sm font-bold text-sf-blue-15 mb-1">{type}</h3>
-                  <p className="text-xs text-sf-gray-60 mb-3">{meta.desc}</p>
-                  <div className="space-y-1 mb-3">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-sf-gray-60">Sessions</span>
-                      <span className="font-bold text-sf-blue-15">{td.count}</span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-sf-gray-60">Registered</span>
-                      <span className="font-bold text-sf-blue-15">{td.registered.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-sf-gray-60">Attended</span>
-                      <span className="font-bold text-sf-blue-15">{td.attendees.toLocaleString()}</span>
-                    </div>
-                    {td.avgCSAT > 0 && (
-                      <div className="flex justify-between text-xs">
-                        <span className="text-sf-gray-60">Learner CSAT</span>
-                        <span className="font-bold" style={{ color: meta.color }}>{td.avgCSAT}%</span>
-                      </div>
-                    )}
-                    {td.avgTrainerCSAT > 0 && (
-                      <div className="flex justify-between text-xs">
-                        <span className="text-sf-gray-60">Trainer CSAT</span>
-                        <span className="font-bold text-sf-blue-50">{td.avgTrainerCSAT}%</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span
-                      className="text-xs font-semibold px-2.5 py-1 rounded-full"
-                      style={{ backgroundColor: `${meta.color}15`, color: meta.color }}
+                <Card className="p-0 h-full overflow-hidden">
+                  <div className="h-1.5" style={{ backgroundColor: meta.color }} />
+                  <div className="p-5">
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110"
+                      style={{ backgroundColor: meta.bg, color: meta.color }}
                     >
-                      {td.count} Sessions
-                    </span>
-                    <ArrowRight size={14} className="text-sf-gray-80 transition-transform group-hover:translate-x-1" />
+                      {meta.icon}
+                    </div>
+                    <h3 className="text-sm font-bold mb-1" style={{ color: meta.color }}>{type}</h3>
+                    <p className="text-xs text-sf-gray-60 mb-3">{meta.desc}</p>
+                    <div className="space-y-1 mb-3">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-sf-gray-60">Sessions</span>
+                        <span className="font-bold text-sf-blue-15">{td.count}</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-sf-gray-60">Registered</span>
+                        <span className="font-bold text-sf-blue-15">{td.registered.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-sf-gray-60">Attended</span>
+                        <span className="font-bold text-sf-blue-15">{td.attendees.toLocaleString()}</span>
+                      </div>
+                      {td.avgCSAT > 0 && (
+                        <div className="flex justify-between text-xs">
+                          <span className="text-sf-gray-60">Learner CSAT</span>
+                          <span className="font-bold" style={{ color: meta.color }}>{td.avgCSAT}%</span>
+                        </div>
+                      )}
+                      {td.avgTrainerCSAT > 0 && (
+                        <div className="flex justify-between text-xs">
+                          <span className="text-sf-gray-60">Trainer CSAT</span>
+                          <span className="font-bold text-sf-blue-50">{td.avgTrainerCSAT}%</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span
+                        className="text-xs font-semibold px-2.5 py-1 rounded-full"
+                        style={{ backgroundColor: `${meta.color}15`, color: meta.color }}
+                      >
+                        {td.count} Sessions
+                      </span>
+                      <ArrowRight size={14} className="text-sf-gray-80 transition-transform group-hover:translate-x-1" />
+                    </div>
                   </div>
                 </Card>
               </Link>
@@ -118,63 +166,6 @@ const Dashboard = () => {
           })}
         </div>
       </div>
-
-      {/* All Programs Table */}
-      {data?.programs?.length > 0 && (
-        <div className="mb-10">
-          <h2 className="text-xl font-bold text-sf-blue-15 mb-5">All Programs</h2>
-          <Card hover={false} className="p-6 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-sf-gray-95">
-                  <th className="text-left py-3 pr-4 font-semibold text-sf-gray-60">Program</th>
-                  <th className="text-left py-3 pr-4 font-semibold text-sf-gray-60">Type</th>
-                  <th className="text-left py-3 pr-4 font-semibold text-sf-gray-60">Trainer</th>
-                  <th className="text-right py-3 pr-4 font-semibold text-sf-gray-60">Registered</th>
-                  <th className="text-right py-3 pr-4 font-semibold text-sf-gray-60">Attended</th>
-                  <th className="text-right py-3 pr-4 font-semibold text-sf-gray-60">Attendance %</th>
-                  <th className="text-right py-3 pr-4 font-semibold text-sf-gray-60">Learner CSAT</th>
-                  <th className="text-right py-3 font-semibold text-sf-gray-60">Trainer CSAT</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.programs.map((p, i) => {
-                  const meta = programMeta[p.programType] || programMeta['Partnership Programs'];
-                  return (
-                    <tr key={i} className="border-b border-sf-gray-95 last:border-0 hover:bg-sf-gray-95 transition-colors">
-                      <td className="py-3 pr-4">
-                        <div className="font-medium text-sf-blue-15">{p.name}</div>
-                        <div className="text-xs text-sf-gray-60">{p.startDate} — {p.endDate}</div>
-                      </td>
-                      <td className="py-3 pr-4">
-                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: `${meta.color}15`, color: meta.color }}>
-                          {p.offeringType}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-4 text-sf-blue-15">{p.trainerName || '—'}</td>
-                      <td className="py-3 pr-4 text-right font-medium text-sf-blue-15">{p.registered ?? '—'}</td>
-                      <td className="py-3 pr-4 text-right font-medium text-sf-blue-15">{p.attendees ?? '—'}</td>
-                      <td className="py-3 pr-4 text-right">
-                        {p.attendancePct !== null ? (
-                          <span className={`font-medium ${p.attendancePct >= 85 ? 'text-sf-green-50' : p.attendancePct >= 70 ? 'text-sf-orange-65' : 'text-sf-pink-40'}`}>
-                            {p.attendancePct}%
-                          </span>
-                        ) : '—'}
-                      </td>
-                      <td className="py-3 pr-4 text-right">
-                        {p.csat !== null ? <span className="font-medium text-sf-violet-50">{p.csat}%</span> : '—'}
-                      </td>
-                      <td className="py-3 text-right">
-                        {p.trainerCSAT !== null ? <span className="font-medium text-sf-blue-50">{p.trainerCSAT}%</span> : '—'}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </Card>
-        </div>
-      )}
 
       {/* Quick Actions */}
       <div>
