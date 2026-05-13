@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -311,11 +312,20 @@ app.get('/api/google-sheets/status', (req, res) => {
   });
 });
 
-// Gemini AI endpoint
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDsQEum68TqoOWX77FLMCH0OUbf94PlK2c';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
+// Gemini AI
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_TEXT_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
+const GEMINI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent';
+
+if (!GEMINI_API_KEY) {
+  console.log('⚠️  GEMINI_API_KEY not set in .env — AI features disabled');
+} else {
+  console.log('✅ Gemini AI available');
+}
 
 app.post('/api/ai/generate-banner', async (req, res) => {
+  if (!GEMINI_API_KEY) return res.status(503).json({ error: 'GEMINI_API_KEY not configured in .env' });
+
   try {
     const { programType, topic, audience } = req.body;
 
@@ -331,7 +341,7 @@ Return ONLY valid JSON (no markdown, no code fences) with these fields:
   "slackPost": "A formatted Slack announcement (3-5 lines with emojis, include hashtags #TechEnablement #TPAPAC)"
 }`;
 
-    const response = await fetch(GEMINI_URL, {
+    const response = await fetch(GEMINI_TEXT_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -364,8 +374,65 @@ Return ONLY valid JSON (no markdown, no code fences) with these fields:
   }
 });
 
+app.post('/api/ai/generate-image', async (req, res) => {
+  if (!GEMINI_API_KEY) return res.status(503).json({ error: 'GEMINI_API_KEY not configured in .env' });
+
+  try {
+    const { programType, title, subtitle, style } = req.body;
+
+    const prompt = `Create a professional, modern event banner image for a Salesforce technology program.
+Program type: ${programType || 'Tech Talk'}
+Title: ${title || 'Tech Enablement'}
+Subtitle: ${subtitle || ''}
+Style: ${style || 'modern gradient'}
+Requirements: Clean, professional design. Salesforce blue color scheme (#066AFE, #001E5B).
+Abstract tech-themed background with subtle geometric shapes or circuit patterns.
+DO NOT include any text in the image - just the background design.
+Make it suitable as a banner background that text will be overlaid on.`;
+
+    const response = await fetch(GEMINI_IMAGE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': GEMINI_API_KEY,
+      },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseModalities: ['TEXT', 'IMAGE'],
+          responseFormat: {
+            image: { aspectRatio: '16:9', imageSize: '2K' },
+          },
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.error('Gemini Image API error:', err);
+      return res.status(response.status).json({ error: 'Gemini Image API error', details: err });
+    }
+
+    const data = await response.json();
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const imagePart = parts.find((p) => p.inlineData);
+
+    if (!imagePart) {
+      return res.status(500).json({ error: 'No image generated', raw: parts.map((p) => p.text).join('') });
+    }
+
+    res.json({
+      image: imagePart.inlineData.data,
+      mimeType: imagePart.inlineData.mimeType,
+    });
+  } catch (error) {
+    console.error('AI image generation error:', error);
+    res.status(500).json({ error: 'Failed to generate image', message: error.message });
+  }
+});
+
 app.get('/api/ai/status', (req, res) => {
-  res.json({ available: true, model: 'gemini-flash-latest' });
+  res.json({ available: !!GEMINI_API_KEY, model: 'gemini-flash' });
 });
 
 // Serve static files in production

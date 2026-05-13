@@ -45,6 +45,8 @@ const BannerCreator = () => {
   const [copied, setCopied] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
+  const [aiBgImage, setAiBgImage] = useState(null);
+  const [imgLoading, setImgLoading] = useState(false);
   const bannerRef = useRef(null);
 
   const handleChange = (e) => {
@@ -74,6 +76,23 @@ const BannerCreator = () => {
       setAiError(err.response?.data?.error || 'AI generation failed');
     }
     setAiLoading(false);
+  };
+
+  const generateAIBackground = async () => {
+    setImgLoading(true);
+    setAiError('');
+    try {
+      const res = await axios.post('/api/ai/generate-image', {
+        programType: bannerData.programType,
+        title: bannerData.title,
+        subtitle: bannerData.subtitle,
+        style: bannerData.template,
+      });
+      setAiBgImage(`data:${res.data.mimeType};base64,${res.data.image}`);
+    } catch (err) {
+      setAiError(err.response?.data?.error || 'Image generation failed');
+    }
+    setImgLoading(false);
   };
 
   const generateSlackPost = () => {
@@ -189,9 +208,20 @@ const BannerCreator = () => {
           <Card hover={false} className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-bold text-sf-blue-15">Preview</h3>
-              <Button variant="primary" size="sm" onClick={downloadBanner}>
-                <Download size={16} /> Download PNG
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="secondary" size="sm" onClick={generateAIBackground} disabled={imgLoading}>
+                  {imgLoading ? <RefreshCw size={14} className="animate-spin" /> : <Zap size={14} />}
+                  {imgLoading ? 'Generating...' : 'AI Background'}
+                </Button>
+                {aiBgImage && (
+                  <Button variant="ghost" size="sm" onClick={() => setAiBgImage(null)}>
+                    Reset
+                  </Button>
+                )}
+                <Button variant="primary" size="sm" onClick={downloadBanner}>
+                  <Download size={16} /> Download
+                </Button>
+              </div>
             </div>
 
             <div className="bg-sf-gray-95 rounded-xl p-4 overflow-auto flex justify-center">
@@ -199,9 +229,11 @@ const BannerCreator = () => {
                 ref={bannerRef}
                 className={`banner-preview ${bannerData.template} rounded-xl`}
                 style={{
-                  background: colors
-                    ? `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`
-                    : '#066AFE',
+                  background: aiBgImage
+                    ? `url(${aiBgImage}) center/cover no-repeat`
+                    : colors
+                      ? `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`
+                      : '#066AFE',
                   width: bannerSizes[bannerData.size].width,
                   height: bannerSizes[bannerData.size].height,
                   minHeight: bannerSizes[bannerData.size].minHeight || 'auto',
