@@ -52,10 +52,11 @@ const Dashboard = () => {
       </div>
 
       {/* Overall Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
         <StatCard icon={<Calendar size={22} />} value={stats?.totalPrograms || 0} label="Total Programs" color="#066AFE" />
-        <StatCard icon={<Users size={22} />} value={(stats?.totalAttendees || 0).toLocaleString()} label="Total Attendees" color="#06A59A" />
-        <StatCard icon={<TrendingUp size={22} />} value={`${stats?.avgAttendance || 0}%`} label="Avg Attendance" color="#45C65A" />
+        <StatCard icon={<FileText size={22} />} value={(stats?.totalRegistered || 0).toLocaleString()} label="Registered" color="#06A59A" />
+        <StatCard icon={<Users size={22} />} value={(stats?.totalAttendees || 0).toLocaleString()} label="Attendees (Completed)" color="#45C65A" />
+        <StatCard icon={<TrendingUp size={22} />} value={`${stats?.avgAttendance || 0}%`} label="Avg Attendance %" color="#F38303" />
         <StatCard icon={<Award size={22} />} value={`${stats?.avgCSAT || 0}%`} label="Avg CSAT" color="#BA01FF" />
       </div>
 
@@ -98,7 +99,11 @@ const Dashboard = () => {
                       <span className="font-bold text-sf-blue-15">{typeData.count}</span>
                     </div>
                     <div className="flex justify-between text-xs">
-                      <span className="text-sf-gray-60">Attendees</span>
+                      <span className="text-sf-gray-60">Registered</span>
+                      <span className="font-bold text-sf-blue-15">{typeData.registered.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-sf-gray-60">Attended</span>
                       <span className="font-bold text-sf-blue-15">{typeData.attendees.toLocaleString()}</span>
                     </div>
                     {typeData.avgCSAT > 0 && (
@@ -158,8 +163,11 @@ const Dashboard = () => {
                           />
                         </div>
                       </div>
-                      <div className="text-sm font-bold text-sf-blue-15 w-16 text-right">
-                        {p.attendees.toLocaleString()}
+                      <div className="text-right flex-shrink-0">
+                        <div className="text-sm font-bold text-sf-blue-15">{p.attendees.toLocaleString()}</div>
+                        {p.attendancePct !== null && (
+                          <div className="text-xs text-sf-gray-60">{p.attendancePct}%</div>
+                        )}
                       </div>
                     </div>
                   );
