@@ -44,7 +44,10 @@
 
 @layer base {
   body {
-    @apply bg-white text-sf-blue-15 antialiased;
+    @apply text-sf-blue-15 antialiased;
+    background: linear-gradient(135deg, #EDF4FF 0%, #F9F0FF 25%, #DEF9F3 50%, #FFF1EA 75%, #EAF5FE 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
   }
 }
 
