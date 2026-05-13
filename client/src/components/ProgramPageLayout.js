@@ -1,7 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { Card, StatCard } from './Card';
 
 export default function ProgramPageLayout({ icon, title, subtitle, color, colorLight, stats, children }) {
+  const navigate = useNavigate();
+
   return (
     <div className="animate-fade-in">
       {/* Hero banner */}
@@ -12,7 +16,13 @@ export default function ProgramPageLayout({ icon, title, subtitle, color, colorL
           </div>
         </div>
         <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="w-9 h-9 rounded-xl flex items-center justify-center bg-white/20 hover:bg-white/30 backdrop-blur-sm transition-all mb-4"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
               {icon && React.cloneElement(icon, { size: 24 })}
             </div>
@@ -34,11 +44,7 @@ export default function ProgramPageLayout({ icon, title, subtitle, color, colorL
       )}
 
       {/* Content */}
-      {children && (
-        <Card hover={false} className="p-6">
-          {children}
-        </Card>
-      )}
+      {children}
     </div>
   );
 }

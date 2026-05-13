@@ -1,48 +1,33 @@
-import React from 'react';
-import { Users, Calendar, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users, Calendar, Award, Clock } from 'lucide-react';
 import ProgramPageLayout from '../components/ProgramPageLayout';
 import { Card } from '../components/Card';
-import Button from '../components/Button';
+import ProgramTable from '../components/ProgramTable';
+import { fetchProgramData } from '../utils/parseProgamData';
 
+const TechTalks = () => {
+  const [programs, setPrograms] = useState([]);
+  useEffect(() => { fetchProgramData().then((d) => setPrograms(d.programs.filter((p) => p.programType === 'Tech Talks'))); }, []);
 
-const upcomingTalks = [
-  { title: 'AI & Trust in Platform Development', date: '2026-05-20', speaker: 'Sarah Chen', attendees: 85 },
-  { title: 'Microservices Architecture Patterns', date: '2026-05-27', speaker: 'Raj Kumar', attendees: 72 },
-  { title: 'Security First: API Design', date: '2026-06-03', speaker: 'Emily Rodriguez', attendees: 68 },
-];
+  const total = programs.reduce((s, p) => s + (p.attendees || 0), 0);
+  const avg = programs.filter((p) => p.csat).length ? Math.round(programs.filter((p) => p.csat).reduce((s, p) => s + p.csat, 0) / programs.filter((p) => p.csat).length) : 0;
 
-const TechTalks = () => (
-  <ProgramPageLayout
-    icon={<Users />}
-    title="Tech Talks"
-    subtitle="Expert-led sessions on cutting-edge technologies and best practices"
-    color="#BA01FF"
-    colorLight="#D17DFE"
-    stats={[
-      { icon: <Calendar size={22} />, value: '45', label: 'Talks This Year' },
-      { icon: <Users size={22} />, value: '1,250', label: 'Total Attendees' },
-      { icon: <Clock size={22} />, value: '60 min', label: 'Avg Duration' },
-    ]}
-  >
-    <h2 className="text-lg font-bold text-sf-blue-15 mb-5">Upcoming Talks</h2>
-    <div className="space-y-3">
-      {upcomingTalks.map((talk, i) => (
-        <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-sf-gray-95 hover:bg-sf-violet-95 transition-colors group">
-          <div className="w-14 h-14 bg-white rounded-xl flex flex-col items-center justify-center flex-shrink-0 shadow-card">
-            <span className="text-xs text-sf-gray-60 font-medium">{new Date(talk.date).toLocaleDateString('en', { month: 'short' })}</span>
-            <span className="text-lg font-bold text-sf-blue-15 leading-tight">{new Date(talk.date).getDate()}</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-bold text-sf-blue-15 truncate">{talk.title}</h3>
-            <p className="text-xs text-sf-gray-60 mt-0.5">{talk.speaker} · {talk.attendees} expected</p>
-          </div>
-          <Button variant="secondary" size="sm" className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-            Register →
-          </Button>
-        </div>
-      ))}
-    </div>
-  </ProgramPageLayout>
-);
+  return (
+    <ProgramPageLayout
+      icon={<Users />} title="Tech Talks" subtitle="Expert-led sessions on cutting-edge technologies and best practices"
+      color="#BA01FF" colorLight="#D17DFE"
+      stats={[
+        { icon: <Calendar size={22} />, value: programs.length, label: 'Talks' },
+        { icon: <Users size={22} />, value: total.toLocaleString(), label: 'Total Attendees' },
+        { icon: <Award size={22} />, value: `${avg}%`, label: 'Avg CSAT' },
+      ]}
+    >
+      <Card hover={false} className="p-6">
+        <h2 className="text-lg font-bold text-sf-blue-15 mb-5">Program Details</h2>
+        <ProgramTable programs={programs} color="#BA01FF" />
+      </Card>
+    </ProgramPageLayout>
+  );
+};
 
 export default TechTalks;
