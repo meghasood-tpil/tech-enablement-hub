@@ -21,7 +21,7 @@ function parseProgramCSV(text) {
     startDate:     headers.findIndex((h) => h.includes('start date')),
     endDate:       headers.findIndex((h) => h.includes('end date')),
     registered:    headers.findIndex((h) => h.includes('registration') || h.includes('enrolled')),
-    attendees:     headers.findIndex((h) => h.includes('attendees') || h.includes('completed')),
+    attendees:     headers.findIndex((h) => (h.includes('no. of attendees') || h.includes('no of attendees') || h.includes('completed')) && !h.includes('duration')),
     attendancePct: headers.findIndex((h) => h.includes('attendance %')),
     noShow:        headers.findIndex((h) => h === 'no-show' || h === 'no show'),
     noShowPct:     headers.findIndex((h) => h.includes('no-show %') || h.includes('no show %')),
