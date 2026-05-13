@@ -1,0 +1,169 @@
+.banner-creator {
+  animation: fadeIn 0.5s ease;
+}
+
+.creator-container {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.creator-form h3, .preview-section h3 {
+  color: #001E5B;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.creator-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.banner-preview {
+  width: 100%;
+  min-height: 400px;
+  border-radius: 16px;
+  padding: 3rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.banner-preview.modern {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.banner-preview.minimal {
+  border: 4px solid white;
+}
+
+.banner-preview.bold {
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.banner-content {
+  position: relative;
+  z-index: 1;
+}
+
+.banner-category {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 0.5rem 1.5rem;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.banner-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.banner-subtitle {
+  font-size: 1.3rem;
+  margin: 0 0 2rem 0;
+  opacity: 0.95;
+  font-weight: 300;
+}
+
+.banner-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.detail-icon {
+  font-size: 1.5rem;
+}
+
+.banner-footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.footer-logo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.slack-preview {
+  background: #F9FAFB;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.slack-preview pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+@media (max-width: 1024px) {
+  .creator-container {
+    grid-template-columns: 1fr;
+  }
+
+  .banner-title {
+    font-size: 2rem;
+  }
+
+  .banner-subtitle {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .banner-preview {
+    padding: 2rem;
+    min-height: 350px;
+  }
+
+  .banner-title {
+    font-size: 1.5rem;
+  }
+
+  .detail-item {
+    font-size: 0.95rem;
+  }
+}

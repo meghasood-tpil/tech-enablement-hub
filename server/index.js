@@ -4,24 +4,9 @@ const multer = require('multer');
 const xlsx = require('xlsx');
 const path = require('path');
 const fs = require('fs');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-// Initialize Gemini AI
-let geminiAI = null;
-try {
-  const { GoogleGenerativeAI } = require('@google/generative-ai');
-  if (process.env.GEMINI_API_KEY) {
-    geminiAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    console.log('✅ Gemini AI initialized');
-  } else {
-    console.log('⚠️  GEMINI_API_KEY not found in .env file');
-  }
-} catch (error) {
-  console.log('⚠️  Gemini AI package not installed. Run: npm install @google/generative-ai');
-}
 
 // Google Sheets API (will be initialized if credentials exist)
 let google = null;
@@ -323,83 +308,6 @@ app.get('/api/google-sheets/status', (req, res) => {
     message: hasGoogleAPI && hasCredentials
       ? 'Google Sheets integration is ready!'
       : 'Setup required - see GOOGLE_SHEETS_INTEGRATION.md'
-  });
-});
-
-// Gemini AI - Generate banner content from description
-app.post('/api/ai/generate-banner', async (req, res) => {
-  try {
-    if (!geminiAI) {
-      return res.status(503).json({
-        error: 'Gemini AI not available',
-        message: 'Check that GEMINI_API_KEY is set in .env file'
-      });
-    }
-
-    const { description, programType } = req.body;
-
-    if (!description) {
-      return res.status(400).json({ error: 'Description is required' });
-    }
-
-    const model = geminiAI.getGenerativeModel({ model: 'gemini-pro' });
-
-    const prompt = `
-You are a marketing expert creating content for tech training programs at Salesforce.
-
-Program Type: ${programType || 'Tech Program'}
-Program Description: ${description}
-
-Based on this description, generate:
-1. A catchy, concise title (max 60 characters)
-2. An engaging subtitle (max 80 characters)
-3. A compelling Slack post announcement (include emojis, bullet points, and relevant hashtags)
-4. 3 recommended design themes (from: modern, professional, bold, minimal, playful, technical)
-5. Suggested color mood (warm, cool, vibrant, calm, energetic)
-
-Return ONLY valid JSON in this exact format:
-{
-  "title": "the catchy title",
-  "subtitle": "the engaging subtitle",
-  "slackPost": "the complete slack post with emojis and formatting",
-  "designThemes": ["theme1", "theme2", "theme3"],
-  "colorMood": "mood description"
-}
-`;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-
-    // Extract JSON from response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('Could not parse AI response');
-    }
-
-    const aiSuggestions = JSON.parse(jsonMatch[0]);
-
-    res.json({
-      success: true,
-      suggestions: aiSuggestions
-    });
-
-  } catch (error) {
-    console.error('Gemini AI error:', error);
-    res.status(500).json({
-      error: 'Failed to generate content',
-      message: error.message
-    });
-  }
-});
-
-// Check Gemini AI status
-app.get('/api/ai/status', (req, res) => {
-  res.json({
-    available: geminiAI !== null,
-    message: geminiAI
-      ? 'Gemini AI is ready!'
-      : 'GEMINI_API_KEY not configured in .env file'
   });
 });
 
