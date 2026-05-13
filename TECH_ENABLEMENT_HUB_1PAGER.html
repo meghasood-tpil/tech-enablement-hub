@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tech Enablement Hub — One Pager</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    width: 297mm; height: 210mm;
+    background: white;
+    color: #001E5B;
+    overflow: hidden;
+    position: relative;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .page {
+    width: 297mm; height: 210mm;
+    padding: 14mm 16mm 12mm 16mm;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 6mm;
+  }
+
+  /* Top accent bar */
+  .page::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4mm;
+    background: linear-gradient(90deg, #066AFE 0%, #BA01FF 25%, #06A59A 50%, #45C65A 75%, #F38303 100%);
+  }
+
+  /* Header */
+  .header {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 4mm;
+    border-bottom: 0.5px solid #DDDBDA;
+  }
+  .header-left { display: flex; align-items: center; gap: 5mm; }
+  .logo { height: 14mm; }
+  .header-title { font-size: 14pt; font-weight: 700; color: #001E5B; }
+  .header-sub { font-size: 7.5pt; color: #706E6B; margin-top: 1mm; }
+  .header-right { text-align: right; font-size: 7pt; color: #706E6B; line-height: 1.6; }
+
+  /* Columns */
+  .col-left, .col-right { display: flex; flex-direction: column; gap: 4mm; }
+
+  /* Section */
+  .section { }
+  .section-title {
+    font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+    color: #066AFE; margin-bottom: 2.5mm;
+    display: flex; align-items: center; gap: 2mm;
+  }
+  .section-title .dot { width: 2.5mm; height: 2.5mm; border-radius: 50%; flex-shrink: 0; }
+
+  /* Why section */
+  .why-text { font-size: 7pt; color: #001E5B; line-height: 1.7; }
+  .why-text b { color: #066AFE; }
+
+  /* Feature cards */
+  .features { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm; }
+  .feature {
+    background: #F8F9FB; border-radius: 2mm; padding: 2.5mm 3mm;
+    border-left: 2.5px solid;
+  }
+  .feature-name { font-size: 7pt; font-weight: 700; color: #001E5B; }
+  .feature-desc { font-size: 6pt; color: #706E6B; margin-top: 0.5mm; line-height: 1.5; }
+
+  /* Tech stack */
+  .tech-grid { display: flex; flex-wrap: wrap; gap: 1.5mm; }
+  .tech-tag {
+    font-size: 6pt; font-weight: 600; padding: 1.2mm 2.5mm;
+    border-radius: 1.5mm; background: #EDF4FF; color: #066AFE;
+  }
+
+  /* Impact */
+  .impact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm; }
+  .impact-card {
+    background: linear-gradient(135deg, #066AFE, #022AC0);
+    border-radius: 2mm; padding: 3mm;
+    color: white; text-align: center;
+  }
+  .impact-before { font-size: 6pt; opacity: 0.8; text-decoration: line-through; }
+  .impact-after { font-size: 11pt; font-weight: 700; margin: 0.5mm 0; }
+  .impact-label { font-size: 5.5pt; opacity: 0.9; }
+
+  /* Automation table */
+  .auto-table { width: 100%; border-collapse: collapse; font-size: 6.5pt; }
+  .auto-table th {
+    text-align: left; padding: 1.5mm 2mm; font-weight: 700; font-size: 6pt;
+    color: #706E6B; border-bottom: 0.5px solid #DDDBDA; text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  .auto-table td { padding: 1.8mm 2mm; border-bottom: 0.3px solid #F3F3F3; vertical-align: top; }
+  .auto-table .integration { font-weight: 600; color: #001E5B; }
+  .auto-table .desc { color: #706E6B; }
+  .status-active {
+    font-size: 5.5pt; font-weight: 700; color: #2E844A;
+    background: #EBF7E6; padding: 0.8mm 2mm; border-radius: 1mm; display: inline-block;
+  }
+  .status-needed {
+    font-size: 5.5pt; font-weight: 700; color: #A86403;
+    background: #FBF3E0; padding: 0.8mm 2mm; border-radius: 1mm; display: inline-block;
+  }
+
+  /* Footer */
+  .footer {
+    grid-column: 1 / -1;
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 3mm; border-top: 0.5px solid #DDDBDA;
+    font-size: 6pt; color: #706E6B;
+  }
+
+  @media print {
+    body { width: 297mm; height: 210mm; }
+    .page { break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <img src="client/src/assets/icons/tpil-logo.png" alt="TPIL" class="logo">
+      <div>
+        <div class="header-title">Tech Enablement Hub</div>
+        <div class="header-sub">Unified platform for program management, reporting & marketing — T&P APAC</div>
+      </div>
+    </div>
+    <div class="header-right">
+      Owner: Megha Sood<br>
+      Status: Live in GitHub Codespaces<br>
+      May 2026
+    </div>
+  </div>
+
+  <!-- Left Column -->
+  <div class="col-left">
+
+    <!-- Why -->
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#066AFE"></span>Why We Built This</div>
+      <div class="why-text">
+        TPIL runs <b>150+ programs/year</b> across 5 types serving <b>thousands of engineers across APAC</b>.
+        Program planning was tracked in spreadsheets (40+ tasks each), banners required design requests with
+        <b>multi-day turnaround</b>, reporting meant manual copy-paste from L++ exports, and leadership had
+        <b>no single dashboard</b> for program health. Data lived in silos across UDMS, L++, Google Sheets, and Slack.
+        This hub consolidates everything into one self-service platform.
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#BA01FF"></span>What It Does</div>
+      <div class="features">
+        <div class="feature" style="border-color:#066AFE">
+          <div class="feature-name">Dashboard</div>
+          <div class="feature-desc">Real-time stats from program data. Attendance, CSAT, trainer feedback. Color-coded by program type. AI-powered Salesforce news feed.</div>
+        </div>
+        <div class="feature" style="border-color:#BA01FF">
+          <div class="feature-name">Banner Creator</div>
+          <div class="feature-desc">8 templates, 6 sizes. AI-generated titles, Slack posts & background images via Gemini. Download as PNG.</div>
+        </div>
+        <div class="feature" style="border-color:#06A59A">
+          <div class="feature-name">Program Planner</div>
+          <div class="feature-desc">Auto-generates 40-task checklist across 6 phases from launch date. Inline editing, CSV export.</div>
+        </div>
+        <div class="feature" style="border-color:#45C65A">
+          <div class="feature-name">Reports & Programs</div>
+          <div class="feature-desc">Upload L++ data for instant CSAT visualization. 5 dedicated program pages with filtered stats & detail tables.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#06A59A"></span>Tech Stack</div>
+      <div class="tech-grid">
+        <span class="tech-tag">React 18</span>
+        <span class="tech-tag">Tailwind CSS</span>
+        <span class="tech-tag">Node.js</span>
+        <span class="tech-tag">Express</span>
+        <span class="tech-tag">Gemini AI</span>
+        <span class="tech-tag" style="background:#F9F0FF;color:#BA01FF">Image Generation</span>
+        <span class="tech-tag">CSV Parser</span>
+        <span class="tech-tag">html2canvas</span>
+        <span class="tech-tag" style="background:#DEF9F3;color:#06A59A">Salesforce Design</span>
+      </div>
+    </div>
+
+    <!-- Impact -->
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#45C65A"></span>Impact</div>
+      <div class="impact-grid">
+        <div class="impact-card">
+          <div class="impact-before">2-3 days</div>
+          <div class="impact-after">2 min</div>
+          <div class="impact-label">Program Planning</div>
+        </div>
+        <div class="impact-card" style="background:linear-gradient(135deg,#BA01FF,#730394)">
+          <div class="impact-before">2-day design wait</div>
+          <div class="impact-after">Instant</div>
+          <div class="impact-label">Banner Creation</div>
+        </div>
+        <div class="impact-card" style="background:linear-gradient(135deg,#06A59A,#023434)">
+          <div class="impact-before">Hours of manual work</div>
+          <div class="impact-after">1 Upload</div>
+          <div class="impact-label">Report Generation</div>
+        </div>
+        <div class="impact-card" style="background:linear-gradient(135deg,#F38303,#5F3E02)">
+          <div class="impact-before">No visibility</div>
+          <div class="impact-after">Real-time</div>
+          <div class="impact-label">Leadership Dashboard</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right Column -->
+  <div class="col-right">
+
+    <!-- Automation Requirements -->
+    <div class="section" style="flex:1">
+      <div class="section-title"><span class="dot" style="background:#F38303"></span>Integration Requirements for Full Automation</div>
+      <table class="auto-table">
+        <thead>
+          <tr><th>Integration</th><th>What It Enables</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="integration">Gemini Flash API</td>
+            <td class="desc">AI text generation — titles, Slack posts, news feed</td>
+            <td><span class="status-active">Active</span></td>
+          </tr>
+          <tr>
+            <td class="integration">Gemini Image API</td>
+            <td class="desc">AI banner background generation</td>
+            <td><span class="status-active">Active</span></td>
+          </tr>
+          <tr>
+            <td class="integration">Google Sheets API</td>
+            <td class="desc">Auto-sync UDMS data — eliminates manual CSV updates</td>
+            <td><span class="status-needed">Needs Access</span></td>
+          </tr>
+          <tr>
+            <td class="integration">L++ API</td>
+            <td class="desc">Pull attendance & CSAT directly from L++ platform</td>
+            <td><span class="status-needed">Needs Access</span></td>
+          </tr>
+          <tr>
+            <td class="integration">Salesforce Data Cloud</td>
+            <td class="desc">Richer reporting with internal Salesforce data</td>
+            <td><span class="status-needed">Needs Access</span></td>
+          </tr>
+          <tr>
+            <td class="integration">Slack Webhooks</td>
+            <td class="desc">Auto-post announcements from Banner Creator to channels</td>
+            <td><span class="status-needed">Needs Access</span></td>
+          </tr>
+          <tr>
+            <td class="integration">Marketing Cloud API</td>
+            <td class="desc">Send program email campaigns directly</td>
+            <td><span class="status-needed">Needs Access</span></td>
+          </tr>
+          <tr>
+            <td class="integration">Calendar API</td>
+            <td class="desc">Auto-create invites from program plans</td>
+            <td><span class="status-needed">Needs Access</span></td>
+          </tr>
+          <tr>
+            <td class="integration">Salesforce SSO / Okta</td>
+            <td class="desc">Team-only authentication for production</td>
+            <td><span class="status-needed">Needs Access</span></td>
+          </tr>
+          <tr>
+            <td class="integration">CI/CD (GitHub Actions)</td>
+            <td class="desc">Auto-deploy on push to main branch</td>
+            <td><span class="status-needed">Setup</span></td>
+          </tr>
+          <tr>
+            <td class="integration">Database (PostgreSQL)</td>
+            <td class="desc">Persistent storage for plans & report history</td>
+            <td><span class="status-needed">Setup</span></td>
+          </tr>
+          <tr>
+            <td class="integration">Custom Domain + Hosting</td>
+            <td class="desc">Production URL on Railway/Render/Vercel</td>
+            <td><span class="status-needed">Setup</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Current Requirements -->
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#022AC0"></span>Current Minimum Requirements</div>
+      <div style="font-size:6.5pt;line-height:1.8;color:#001E5B">
+        <b>GitHub Codespaces</b> — active at <span style="color:#066AFE">meghasood-tpil/tech-enablement-hub</span><br>
+        <b>Node.js v18+</b> — included in Codespaces<br>
+        <b>Gemini API Key</b> — set in <code style="background:#F3F3F3;padding:0.5mm 1.5mm;border-radius:1mm;font-size:6pt">.env</code> file (from aistudio.google.com)<br>
+        <b>Program Data</b> — CSV file updated in <code style="background:#F3F3F3;padding:0.5mm 1.5mm;border-radius:1mm;font-size:6pt">client/public/data/program-data.csv</code>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>Technology, People, Innovation & Learning — T&P APAC, Salesforce</span>
+    <span>Built with React, Tailwind CSS, Gemini AI & Claude Code</span>
+  </div>
+
+</div>
+</body>
+</html>
