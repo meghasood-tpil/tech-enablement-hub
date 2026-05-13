@@ -81,7 +81,7 @@ const Dashboard = () => {
         <h2 className="text-xl font-bold text-sf-blue-15 mb-5">Programs</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {Object.entries(programMeta).map(([type, meta]) => {
-            const typeData = byType[type] || { count: 0, attendees: 0, avgCSAT: 0 };
+            const typeData = byType[type] || { count: 0, attendees: 0, registered: 0, avgCSAT: 0 };
             return (
               <Link key={type} to={meta.link} className="group">
                 <Card className="p-5 h-full">
