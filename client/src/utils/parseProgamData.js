@@ -53,7 +53,12 @@ function parseProgramCSV(text) {
     });
   }
 
-  return { programs, stats: computeStats(programs) };
+  const cy2026 = programs.filter((p) => {
+    const d = parseDate(p.startDate);
+    return d && d.getFullYear() >= 2026;
+  });
+
+  return { programs: cy2026, stats: computeStats(cy2026) };
 }
 
 function mapOfferingToType(offering) {
@@ -165,6 +170,12 @@ function parseNum(val) {
   const cleaned = val.replace(/[^0-9.]/g, '');
   const n = parseFloat(cleaned);
   return isNaN(n) ? null : n;
+}
+
+function parseDate(val) {
+  if (!val) return null;
+  const d = new Date(val);
+  return isNaN(d.getTime()) ? null : d;
 }
 
 function parsePct(val) {
