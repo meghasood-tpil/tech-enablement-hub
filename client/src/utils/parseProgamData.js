@@ -8,37 +8,44 @@ function parseProgramCSV(text) {
   const rows = parseCSVWithQuotes(text);
 
   const headerIdx = rows.findIndex(
-    (r) => r.some((c) => c.includes('Quarter')) && r.some((c) => c.includes('Program Type'))
+    (r) => r.some((c) => c.includes('Training Name') || c.includes('Program Name'))
+      && r.some((c) => c.includes('Program Type'))
   );
   if (headerIdx === -1) return { programs: [], stats: emptyStats() };
 
   const headers = rows[headerIdx].map((h) => h.replace(/[\n\r]+/g, ' ').trim().toLowerCase());
-  const col = {
-    quarter:       headers.findIndex((h) => h === 'quarter'),
-    trainingName:  headers.findIndex((h) => h.includes('training name') || h.includes('program name')),
-    programType:   headers.findIndex((h) => h === 'program type'),
-    offeringType:  headers.findIndex((h) => h === 'offering type'),
-    startDate:     headers.findIndex((h) => h.includes('start date')),
-    endDate:       headers.findIndex((h) => h.includes('end date')),
-    registered:    headers.findIndex((h) => h.includes('registration') || h.includes('enrolled')),
-    attendees:     headers.findIndex((h) => (h.includes('no. of attendees') || h.includes('no of attendees') || h.includes('completed')) && !h.includes('duration')),
-    attendancePct: headers.findIndex((h) => h.includes('attendance %')),
-    noShow:        headers.findIndex((h) => h === 'no-show' || h === 'no show'),
-    noShowPct:     headers.findIndex((h) => h.includes('no-show %') || h.includes('no show %')),
-    csat:          headers.findIndex((h) => h.includes('learner') && h.includes('perception')),
-    feedbackCount: headers.findIndex((h) => h.includes('count of feedback') || h.includes('count') && h.includes('feedback')),
-    learningHours: headers.findIndex((h) => h.includes('learning hours')),
-  };
+
+  const col = {};
+  headers.forEach((h, i) => {
+    if (h.includes('training name') || h.includes('program name')) col.name = i;
+    else if (h === 'program type') col.programType = i;
+    else if (h === 'offering type' || h === 'offering') col.offeringType = i;
+    else if (h.includes('start date')) col.startDate = i;
+    else if (h.includes('end date')) col.endDate = i;
+    else if (h.includes('learning hours')) col.learningHours = i;
+    else if (h.includes('registration') || h.includes('enrolled')) col.registered = i;
+    else if (h.includes('waitlist')) col.waitlist = i;
+    else if ((h.includes('no. of attendees') || h.includes('no of attendees') || h.includes('completed')) && !h.includes('duration')) col.attendees = i;
+    else if (h === 'attendance %') col.attendancePct = i;
+    else if (h === 'no-show' && !h.includes('%')) col.noShow = i;
+    else if (h.includes('no-show %')) col.noShowPct = i;
+    else if (h.includes('learner') && h.includes('perception')) col.csat = i;
+    else if (h.includes('learner') && h.includes('activity')) col.learnerActivity = i;
+    else if (h.includes('avg') && h.includes('trainer') && h.includes('feedback')) col.avgTrainerFeedback = i;
+    else if (h.includes('count of feedback')) col.feedbackCount = i;
+    else if (h === 'response %') col.responsePct = i;
+    else if (h === 'trainer name') col.trainerName = i;
+    else if (h.includes('trainer feedback%') || h.includes('trainer feedback %')) col.trainerCSAT = i;
+  });
 
   const programs = [];
   for (let i = headerIdx + 1; i < rows.length; i++) {
     const r = rows[i];
     if (r.length < 5) continue;
 
-    const get = (idx) => (idx >= 0 && idx < r.length ? r[idx].replace(/[\n\r]+/g, ' ').trim() : '');
+    const get = (idx) => (idx !== undefined && idx < r.length ? r[idx].replace(/[\n\r]+/g, ' ').trim() : '');
 
-    const quarter = get(col.quarter);
-    const name = get(col.trainingName);
+    const name = get(col.name);
     let programType = get(col.programType);
     const offeringType = get(col.offeringType);
 
@@ -48,29 +55,25 @@ function parseProgramCSV(text) {
     else if (programType === 'Tech') programType = mapOfferingToType(offeringType);
     else if (programType === 'Onboarding') programType = 'Onboarding Program';
 
-    const startDate = get(col.startDate);
-    const attendees = parseNum(get(col.attendees));
-    const registered = parseNum(get(col.registered));
-    const csat = parseNum(get(col.csat));
-    const attendancePct = parsePct(get(col.attendancePct));
-    const noShow = parseNum(get(col.noShow));
-    const noShowPct = parsePct(get(col.noShowPct));
-    const feedbackCount = parseNum(get(col.feedbackCount));
-
     programs.push({
-      quarter, name, programType, offeringType, startDate,
+      name,
+      programType,
+      offeringType,
+      startDate: get(col.startDate),
       endDate: get(col.endDate),
-      attendees, registered, csat, attendancePct,
-      noShow, noShowPct, feedbackCount,
+      registered: parseNum(get(col.registered)),
+      attendees: parseNum(get(col.attendees)),
+      attendancePct: parsePct(get(col.attendancePct)),
+      noShow: parseNum(get(col.noShow)),
+      noShowPct: parsePct(get(col.noShowPct)),
+      csat: parseNum(get(col.csat)),
+      feedbackCount: parseNum(get(col.feedbackCount)),
+      trainerName: get(col.trainerName),
+      trainerCSAT: parsePct(get(col.trainerCSAT)),
     });
   }
 
-  const cy2026 = programs.filter((p) => {
-    const d = parseDate(p.startDate);
-    return d && d.getFullYear() >= 2026;
-  });
-
-  return { programs: cy2026, stats: computeStats(cy2026) };
+  return { programs, stats: computeStats(programs) };
 }
 
 function mapOfferingToType(offering) {
@@ -99,36 +102,37 @@ function computeStats(programs) {
     ? Math.round(withCSAT.reduce((s, p) => s + p.csat, 0) / withCSAT.length)
     : 0;
 
-  const byType = {};
-  const byQuarter = {};
-  programs.forEach((p) => {
-    if (!byType[p.programType]) byType[p.programType] = { count: 0, attendees: 0, registered: 0, csatSum: 0, csatCount: 0 };
-    byType[p.programType].count++;
-    byType[p.programType].attendees += p.attendees || 0;
-    byType[p.programType].registered += p.registered || 0;
-    if (p.csat !== null && p.csat > 0) {
-      byType[p.programType].csatSum += p.csat;
-      byType[p.programType].csatCount++;
-    }
+  const withTrainerCSAT = programs.filter((p) => p.trainerCSAT !== null);
+  const avgTrainerCSAT = withTrainerCSAT.length
+    ? Math.round(withTrainerCSAT.reduce((s, p) => s + p.trainerCSAT, 0) / withTrainerCSAT.length)
+    : 0;
 
-    if (p.quarter) {
-      if (!byQuarter[p.quarter]) byQuarter[p.quarter] = { count: 0, attendees: 0 };
-      byQuarter[p.quarter].count++;
-      byQuarter[p.quarter].attendees += p.attendees || 0;
-    }
+  const byType = {};
+  programs.forEach((p) => {
+    if (!byType[p.programType]) byType[p.programType] = {
+      count: 0, attendees: 0, registered: 0,
+      csatSum: 0, csatCount: 0,
+      trainerCsatSum: 0, trainerCsatCount: 0,
+    };
+    const t = byType[p.programType];
+    t.count++;
+    t.attendees += p.attendees || 0;
+    t.registered += p.registered || 0;
+    if (p.csat !== null && p.csat > 0) { t.csatSum += p.csat; t.csatCount++; }
+    if (p.trainerCSAT !== null) { t.trainerCsatSum += p.trainerCSAT; t.trainerCsatCount++; }
   });
 
   Object.keys(byType).forEach((k) => {
-    byType[k].avgCSAT = byType[k].csatCount
-      ? Math.round(byType[k].csatSum / byType[k].csatCount)
-      : 0;
+    const t = byType[k];
+    t.avgCSAT = t.csatCount ? Math.round(t.csatSum / t.csatCount) : 0;
+    t.avgTrainerCSAT = t.trainerCsatCount ? Math.round(t.trainerCsatSum / t.trainerCsatCount) : 0;
   });
 
-  return { totalPrograms, totalAttendees, totalRegistered, avgAttendance, avgCSAT, byType, byQuarter };
+  return { totalPrograms, totalAttendees, totalRegistered, avgAttendance, avgCSAT, avgTrainerCSAT, byType };
 }
 
 function emptyStats() {
-  return { totalPrograms: 0, totalAttendees: 0, totalRegistered: 0, avgAttendance: 0, avgCSAT: 0, byType: {}, byQuarter: {} };
+  return { totalPrograms: 0, totalAttendees: 0, totalRegistered: 0, avgAttendance: 0, avgCSAT: 0, avgTrainerCSAT: 0, byType: {} };
 }
 
 function parseCSVWithQuotes(text) {
@@ -139,50 +143,23 @@ function parseCSVWithQuotes(text) {
 
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
-
     if (inQuotes) {
-      if (ch === '"' && text[i + 1] === '"') {
-        field += '"';
-        i++;
-      } else if (ch === '"') {
-        inQuotes = false;
-      } else {
-        field += ch;
-      }
+      if (ch === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (ch === '"') { inQuotes = false; }
+      else { field += ch; }
     } else {
-      if (ch === '"') {
-        inQuotes = true;
-      } else if (ch === ',') {
-        current.push(field);
-        field = '';
-      } else if (ch === '\n' || (ch === '\r' && text[i + 1] === '\n')) {
+      if (ch === '"') { inQuotes = true; }
+      else if (ch === ',') { current.push(field); field = ''; }
+      else if (ch === '\n' || (ch === '\r' && text[i + 1] === '\n')) {
         if (ch === '\r') i++;
-        current.push(field);
-        field = '';
-        rows.push(current);
-        current = [];
+        current.push(field); field = ''; rows.push(current); current = [];
       } else if (ch === '\r') {
-        current.push(field);
-        field = '';
-        rows.push(current);
-        current = [];
-      } else {
-        field += ch;
-      }
+        current.push(field); field = ''; rows.push(current); current = [];
+      } else { field += ch; }
     }
   }
-  if (field || current.length) {
-    current.push(field);
-    rows.push(current);
-  }
-
+  if (field || current.length) { current.push(field); rows.push(current); }
   return rows;
-}
-
-function parseDate(val) {
-  if (!val) return null;
-  const d = new Date(val);
-  return isNaN(d.getTime()) ? null : d;
 }
 
 function parseNum(val) {

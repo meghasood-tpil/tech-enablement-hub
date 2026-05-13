@@ -39,7 +39,6 @@ const Dashboard = () => {
 
   const stats = data?.stats;
   const byType = stats?.byType || {};
-  const byQuarter = stats?.byQuarter || {};
 
   return (
     <div className="animate-fade-in">
@@ -48,40 +47,25 @@ const Dashboard = () => {
         <h1 className="text-4xl font-bold text-sf-blue-15 tracking-tight">
           Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}
         </h1>
-        <p className="mt-2 text-lg text-sf-gray-60">FY26 Tech Enablement at a glance — powered by real UDMS data.</p>
+        <p className="mt-2 text-lg text-sf-gray-60">CY2026 Tech Enablement at a glance — powered by real program data.</p>
       </div>
 
       {/* Overall Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-10">
         <StatCard icon={<Calendar size={22} />} value={stats?.totalPrograms || 0} label="Total Programs" color="#066AFE" />
         <StatCard icon={<FileText size={22} />} value={(stats?.totalRegistered || 0).toLocaleString()} label="Registered" color="#06A59A" />
-        <StatCard icon={<Users size={22} />} value={(stats?.totalAttendees || 0).toLocaleString()} label="Attendees (Completed)" color="#45C65A" />
-        <StatCard icon={<TrendingUp size={22} />} value={`${stats?.avgAttendance || 0}%`} label="Avg Attendance %" color="#F38303" />
-        <StatCard icon={<Award size={22} />} value={`${stats?.avgCSAT || 0}%`} label="Avg CSAT" color="#BA01FF" />
+        <StatCard icon={<Users size={22} />} value={(stats?.totalAttendees || 0).toLocaleString()} label="Attendees" color="#45C65A" />
+        <StatCard icon={<TrendingUp size={22} />} value={`${stats?.avgAttendance || 0}%`} label="Avg Attendance" color="#F38303" />
+        <StatCard icon={<Award size={22} />} value={`${stats?.avgCSAT || 0}%`} label="Learner CSAT" color="#BA01FF" />
+        <StatCard icon={<Activity size={22} />} value={`${stats?.avgTrainerCSAT || 0}%`} label="Trainer CSAT" color="#066AFE" />
       </div>
-
-      {/* Quarterly Breakdown */}
-      {Object.keys(byQuarter).length > 0 && (
-        <div className="mb-10">
-          <h2 className="text-xl font-bold text-sf-blue-15 mb-5">By Quarter</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {Object.entries(byQuarter).map(([q, qData]) => (
-              <Card key={q} className="p-5">
-                <div className="text-xs font-semibold text-sf-gray-60 uppercase tracking-wider mb-2">{q}</div>
-                <div className="text-2xl font-bold text-sf-blue-15">{qData.count}</div>
-                <div className="text-sm text-sf-gray-60">programs · {qData.attendees.toLocaleString()} attendees</div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Programs by Type */}
       <div className="mb-10">
         <h2 className="text-xl font-bold text-sf-blue-15 mb-5">Programs</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {Object.entries(programMeta).map(([type, meta]) => {
-            const typeData = byType[type] || { count: 0, attendees: 0, registered: 0, avgCSAT: 0 };
+            const td = byType[type] || { count: 0, attendees: 0, registered: 0, avgCSAT: 0, avgTrainerCSAT: 0 };
             return (
               <Link key={type} to={meta.link} className="group">
                 <Card className="p-5 h-full">
@@ -96,20 +80,26 @@ const Dashboard = () => {
                   <div className="space-y-1 mb-3">
                     <div className="flex justify-between text-xs">
                       <span className="text-sf-gray-60">Sessions</span>
-                      <span className="font-bold text-sf-blue-15">{typeData.count}</span>
+                      <span className="font-bold text-sf-blue-15">{td.count}</span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span className="text-sf-gray-60">Registered</span>
-                      <span className="font-bold text-sf-blue-15">{typeData.registered.toLocaleString()}</span>
+                      <span className="font-bold text-sf-blue-15">{td.registered.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span className="text-sf-gray-60">Attended</span>
-                      <span className="font-bold text-sf-blue-15">{typeData.attendees.toLocaleString()}</span>
+                      <span className="font-bold text-sf-blue-15">{td.attendees.toLocaleString()}</span>
                     </div>
-                    {typeData.avgCSAT > 0 && (
+                    {td.avgCSAT > 0 && (
                       <div className="flex justify-between text-xs">
-                        <span className="text-sf-gray-60">Avg CSAT</span>
-                        <span className="font-bold" style={{ color: meta.color }}>{typeData.avgCSAT}%</span>
+                        <span className="text-sf-gray-60">Learner CSAT</span>
+                        <span className="font-bold" style={{ color: meta.color }}>{td.avgCSAT}%</span>
+                      </div>
+                    )}
+                    {td.avgTrainerCSAT > 0 && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-sf-gray-60">Trainer CSAT</span>
+                        <span className="font-bold text-sf-blue-50">{td.avgTrainerCSAT}%</span>
                       </div>
                     )}
                   </div>
@@ -118,7 +108,7 @@ const Dashboard = () => {
                       className="text-xs font-semibold px-2.5 py-1 rounded-full"
                       style={{ backgroundColor: `${meta.color}15`, color: meta.color }}
                     >
-                      {typeData.count} Sessions
+                      {td.count} Sessions
                     </span>
                     <ArrowRight size={14} className="text-sf-gray-80 transition-transform group-hover:translate-x-1" />
                   </div>
@@ -129,50 +119,59 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Top Programs by Attendance */}
+      {/* All Programs Table */}
       {data?.programs?.length > 0 && (
         <div className="mb-10">
-          <h2 className="text-xl font-bold text-sf-blue-15 mb-5">Top Programs by Attendance</h2>
-          <Card hover={false} className="p-6">
-            <div className="space-y-3">
-              {[...data.programs]
-                .filter(p => p.attendees > 0)
-                .sort((a, b) => b.attendees - a.attendees)
-                .slice(0, 8)
-                .map((p, i) => {
-                  const maxAttendees = data.programs.reduce((m, x) => Math.max(m, x.attendees || 0), 1);
+          <h2 className="text-xl font-bold text-sf-blue-15 mb-5">All Programs</h2>
+          <Card hover={false} className="p-6 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-sf-gray-95">
+                  <th className="text-left py-3 pr-4 font-semibold text-sf-gray-60">Program</th>
+                  <th className="text-left py-3 pr-4 font-semibold text-sf-gray-60">Type</th>
+                  <th className="text-left py-3 pr-4 font-semibold text-sf-gray-60">Trainer</th>
+                  <th className="text-right py-3 pr-4 font-semibold text-sf-gray-60">Registered</th>
+                  <th className="text-right py-3 pr-4 font-semibold text-sf-gray-60">Attended</th>
+                  <th className="text-right py-3 pr-4 font-semibold text-sf-gray-60">Attendance %</th>
+                  <th className="text-right py-3 pr-4 font-semibold text-sf-gray-60">Learner CSAT</th>
+                  <th className="text-right py-3 font-semibold text-sf-gray-60">Trainer CSAT</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.programs.map((p, i) => {
                   const meta = programMeta[p.programType] || programMeta['Partnership Programs'];
                   return (
-                    <div key={i} className="flex items-center gap-4">
-                      <div className="w-6 text-right text-sm font-bold text-sf-gray-60">{i + 1}</div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-medium text-sf-blue-15 truncate">{p.name}</span>
-                          <span className="text-xs px-2 py-0.5 rounded-full flex-shrink-0"
-                                style={{ backgroundColor: `${meta.color}15`, color: meta.color }}>
-                            {p.programType}
+                    <tr key={i} className="border-b border-sf-gray-95 last:border-0 hover:bg-sf-gray-95 transition-colors">
+                      <td className="py-3 pr-4">
+                        <div className="font-medium text-sf-blue-15">{p.name}</div>
+                        <div className="text-xs text-sf-gray-60">{p.startDate} — {p.endDate}</div>
+                      </td>
+                      <td className="py-3 pr-4">
+                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: `${meta.color}15`, color: meta.color }}>
+                          {p.offeringType}
+                        </span>
+                      </td>
+                      <td className="py-3 pr-4 text-sf-blue-15">{p.trainerName || '—'}</td>
+                      <td className="py-3 pr-4 text-right font-medium text-sf-blue-15">{p.registered ?? '—'}</td>
+                      <td className="py-3 pr-4 text-right font-medium text-sf-blue-15">{p.attendees ?? '—'}</td>
+                      <td className="py-3 pr-4 text-right">
+                        {p.attendancePct !== null ? (
+                          <span className={`font-medium ${p.attendancePct >= 85 ? 'text-sf-green-50' : p.attendancePct >= 70 ? 'text-sf-orange-65' : 'text-sf-pink-40'}`}>
+                            {p.attendancePct}%
                           </span>
-                        </div>
-                        <div className="h-2 bg-sf-gray-95 rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-700"
-                            style={{
-                              width: `${(p.attendees / maxAttendees) * 100}%`,
-                              backgroundColor: meta.color,
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <div className="text-sm font-bold text-sf-blue-15">{p.attendees.toLocaleString()}</div>
-                        {p.attendancePct !== null && (
-                          <div className="text-xs text-sf-gray-60">{p.attendancePct}%</div>
-                        )}
-                      </div>
-                    </div>
+                        ) : '—'}
+                      </td>
+                      <td className="py-3 pr-4 text-right">
+                        {p.csat !== null ? <span className="font-medium text-sf-violet-50">{p.csat}%</span> : '—'}
+                      </td>
+                      <td className="py-3 text-right">
+                        {p.trainerCSAT !== null ? <span className="font-medium text-sf-blue-50">{p.trainerCSAT}%</span> : '—'}
+                      </td>
+                    </tr>
                   );
                 })}
-            </div>
+              </tbody>
+            </table>
           </Card>
         </div>
       )}
