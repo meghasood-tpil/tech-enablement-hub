@@ -1,9 +1,9 @@
 import React from 'react';
-import { Users, Calendar, Clock, ArrowRight } from 'lucide-react';
+import { Users, Calendar, Clock } from 'lucide-react';
 import ProgramPageLayout from '../components/ProgramPageLayout';
 import { Card } from '../components/Card';
 import Button from '../components/Button';
-import Badge from '../components/Badge';
+
 
 const upcomingTalks = [
   { title: 'AI & Trust in Platform Development', date: '2026-05-20', speaker: 'Sarah Chen', attendees: 85 },
@@ -37,7 +37,7 @@ const TechTalks = () => (
             <p className="text-xs text-sf-gray-60 mt-0.5">{talk.speaker} · {talk.attendees} expected</p>
           </div>
           <Button variant="secondary" size="sm" className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-            Register <ArrowRight size={14} />
+            Register →
           </Button>
         </div>
       ))}

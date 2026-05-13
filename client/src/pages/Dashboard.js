@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Users, TrendingUp, BookOpen, Handshake, ArrowRight, Clipboard, Palette, BarChart3, Star, Loader } from 'lucide-react';
+import { Calendar, Users, TrendingUp, BookOpen, Handshake, ArrowRight, FileText, Award, Activity, RefreshCw } from 'lucide-react';
 import { Card, StatCard } from '../components/Card';
 import { fetchProgramData } from '../utils/parseProgamData';
 
@@ -13,9 +13,9 @@ const programMeta = {
 };
 
 const quickActions = [
-  { to: '/planner', icon: <Clipboard size={24} />, title: 'Create Program Plan', desc: 'Auto-generate checklist with timeline', color: '#066AFE' },
-  { to: '/banner-creator', icon: <Palette size={24} />, title: 'Design Banner', desc: 'Create Slack posts & marketing materials', color: '#BA01FF' },
-  { to: '/reports', icon: <BarChart3 size={24} />, title: 'Generate Report', desc: 'Upload L++ data for insights', color: '#06A59A' },
+  { to: '/planner', icon: <FileText size={24} />, title: 'Create Program Plan', desc: 'Auto-generate checklist with timeline', color: '#066AFE' },
+  { to: '/banner-creator', icon: <Award size={24} />, title: 'Design Banner', desc: 'Create Slack posts & marketing materials', color: '#BA01FF' },
+  { to: '/reports', icon: <Activity size={24} />, title: 'Generate Report', desc: 'Upload L++ data for insights', color: '#06A59A' },
 ];
 
 const Dashboard = () => {
@@ -32,7 +32,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader size={28} className="animate-spin text-sf-blue-50" />
+        <RefreshCw size={28} className="animate-spin text-sf-blue-50" />
       </div>
     );
   }
@@ -56,7 +56,7 @@ const Dashboard = () => {
         <StatCard icon={<Calendar size={22} />} value={stats?.totalPrograms || 0} label="Total Programs" color="#066AFE" />
         <StatCard icon={<Users size={22} />} value={(stats?.totalAttendees || 0).toLocaleString()} label="Total Attendees" color="#06A59A" />
         <StatCard icon={<TrendingUp size={22} />} value={`${stats?.avgAttendance || 0}%`} label="Avg Attendance" color="#45C65A" />
-        <StatCard icon={<Star size={22} />} value={`${stats?.avgCSAT || 0}%`} label="Avg CSAT" color="#BA01FF" />
+        <StatCard icon={<Award size={22} />} value={`${stats?.avgCSAT || 0}%`} label="Avg CSAT" color="#BA01FF" />
       </div>
 
       {/* Quarterly Breakdown */}

@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
 import { programColors } from '../utils/salesforceColors';
 import { programTypes } from '../utils/checklistTemplate';
-import { Download, Copy, Check, Sparkles } from 'lucide-react';
+import { Download, RefreshCw, CheckCircle } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import Button from '../components/Button';
 import { Card } from '../components/Card';
@@ -193,7 +193,7 @@ const BannerCreator = () => {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-bold text-sf-blue-15">Slack Post</h3>
               <Button variant="secondary" size="sm" onClick={generateSlackPost}>
-                <Sparkles size={16} /> Generate
+                <RefreshCw size={16} /> Generate
               </Button>
             </div>
 
@@ -204,7 +204,7 @@ const BannerCreator = () => {
                 </pre>
                 <div className="mt-3 flex justify-end">
                   <Button variant="ghost" size="sm" onClick={copySlackPost}>
-                    {copied ? <Check size={16} className="text-sf-green-70" /> : <Copy size={16} />}
+                    {copied ? <CheckCircle size={16} className="text-sf-green-70" /> : <Download size={16} />}
                     {copied ? 'Copied!' : 'Copy'}
                   </Button>
                 </div>

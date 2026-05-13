@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Upload, Users, TrendingUp, Award, FileText, RefreshCw, ArrowLeft, Star } from 'lucide-react';
+import { Upload, Users, TrendingUp, Award, FileText, RefreshCw } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import Button from '../components/Button';
 import { Card, StatCard } from '../components/Card';
@@ -94,7 +94,7 @@ const ReportGenerator = () => {
           subtitle={file ? `Source: ${file.name}` : 'Live from Google Sheets'}
           actions={
             <Button variant="ghost" size="sm" onClick={() => { setReportData(null); setFile(null); }}>
-              <ArrowLeft size={16} /> New Report
+              ← New Report
             </Button>
           }
         />
@@ -103,7 +103,7 @@ const ReportGenerator = () => {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard icon={<Users size={22} />} value={reportData.totalParticipants} label="Participants" color="#066AFE" />
           <StatCard icon={<TrendingUp size={22} />} value={`${reportData.completionRate}%`} label="Completion Rate" color="#45C65A" />
-          <StatCard icon={<Star size={22} />} value={`${reportData.avgCSAT}/5`} label="Avg CSAT" color="#FCC003" />
+          <StatCard icon={<Award size={22} />} value={`${reportData.avgCSAT}/5`} label="Avg CSAT" color="#FCC003" />
           <StatCard icon={<Award size={22} />} value={reportData.certifications} label="Certifications" color="#BA01FF" />
         </div>
 
@@ -115,7 +115,7 @@ const ReportGenerator = () => {
               {reportData.feedback.map((item, i) => (
                 <div key={item.rating} className="flex items-center gap-3">
                   <div className="w-16 text-sm text-sf-gray-60 flex items-center gap-1">
-                    <Star size={14} className="text-sf-yellow-80 fill-sf-yellow-80" />
+                    <Award size={14} className="text-sf-yellow-80" />
                     {item.rating}
                   </div>
                   <div className="flex-1 h-2.5 bg-sf-gray-95 rounded-full overflow-hidden">

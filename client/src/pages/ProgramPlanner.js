@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { format, addDays } from 'date-fns';
 import { masterChecklistTemplate, programTypes } from '../utils/checklistTemplate';
 import { programColors } from '../utils/salesforceColors';
-import { Download, CheckCircle, Circle, Save, ArrowLeft, Rocket } from 'lucide-react';
+import { Download, CheckCircle, Circle, Save, ArrowRight, Zap } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import Button from '../components/Button';
 import { Card } from '../components/Card';
@@ -126,7 +126,7 @@ const ProgramPlanner = () => {
             onClick={generateChecklist}
             disabled={!formData.sessionName || !formData.programManager}
           >
-            <Rocket size={18} /> Generate Program Plan
+            <Zap size={18} /> Generate Program Plan
           </Button>
         </Card>
       </div>
@@ -150,7 +150,7 @@ const ProgramPlanner = () => {
           </div>
           <div className="flex gap-2 flex-shrink-0">
             <Button variant="ghost" size="sm" className="!text-white/80 hover:!text-white hover:!bg-white/10" onClick={() => setShowChecklist(false)}>
-              <ArrowLeft size={16} /> Back
+              ← Back
             </Button>
             <Button variant="ghost" size="sm" className="!text-white/80 hover:!text-white hover:!bg-white/10" onClick={saveProgress}>
               <Save size={16} /> Save

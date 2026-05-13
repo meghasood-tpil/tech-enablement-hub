@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, NavLink, useLocation } from 'react-router-dom';
-import { Zap, Menu, X } from 'lucide-react';
+import { Zap } from 'lucide-react';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const ProgramPlanner = lazy(() => import('./pages/ProgramPlanner'));
@@ -127,7 +127,7 @@ function Navigation() {
             className="md:hidden p-2 rounded-lg hover:bg-sf-gray-95 text-sf-gray-60"
             onClick={() => setMobileOpen(o => !o)}
           >
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+            {mobileOpen ? '✕' : '☰'}
           </button>
         </div>
       </div>
