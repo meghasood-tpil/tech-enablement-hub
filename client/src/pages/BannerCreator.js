@@ -60,17 +60,35 @@ const BannerCreator = () => {
     setAiLoading(true);
     setAiError('');
     try {
-      const res = await axios.post('/api/ai/generate-banner', {
-        programType: bannerData.programType,
-        topic: bannerData.topic || bannerData.title,
-      });
-      setBannerData(prev => ({
-        ...prev,
-        title: res.data.title || prev.title,
-        subtitle: res.data.subtitle || prev.subtitle,
-      }));
-      if (res.data.slackPost) {
-        setSlackPost(res.data.slackPost);
+      const [textRes, imgRes] = await Promise.allSettled([
+        axios.post('/api/ai/generate-banner', {
+          programType: bannerData.programType,
+          topic: bannerData.topic || bannerData.title,
+        }),
+        axios.post('/api/ai/generate-image', {
+          programType: bannerData.programType,
+          title: bannerData.topic || bannerData.title || 'Tech Enablement',
+          subtitle: bannerData.subtitle,
+          style: bannerData.template,
+        }),
+      ]);
+
+      if (textRes.status === 'fulfilled') {
+        const d = textRes.value.data;
+        setBannerData(prev => ({
+          ...prev,
+          title: d.title || prev.title,
+          subtitle: d.subtitle || prev.subtitle,
+        }));
+        if (d.slackPost) setSlackPost(d.slackPost);
+      }
+
+      if (imgRes.status === 'fulfilled' && imgRes.value.data.image) {
+        setAiBgImage(`data:${imgRes.value.data.mimeType};base64,${imgRes.value.data.image}`);
+      }
+
+      if (textRes.status === 'rejected' && imgRes.status === 'rejected') {
+        setAiError('AI generation failed — check your API key');
       }
     } catch (err) {
       setAiError(err.response?.data?.error || 'AI generation failed');
@@ -84,7 +102,7 @@ const BannerCreator = () => {
     try {
       const res = await axios.post('/api/ai/generate-image', {
         programType: bannerData.programType,
-        title: bannerData.title,
+        title: bannerData.title || bannerData.topic || 'Tech Enablement',
         subtitle: bannerData.subtitle,
         style: bannerData.template,
       });

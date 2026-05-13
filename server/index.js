@@ -400,9 +400,6 @@ Make it suitable as a banner background that text will be overlaid on.`;
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           responseModalities: ['TEXT', 'IMAGE'],
-          responseFormat: {
-            image: { aspectRatio: '16:9', imageSize: '2K' },
-          },
         },
       }),
     });
